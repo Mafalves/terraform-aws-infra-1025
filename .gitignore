@@ -1,0 +1,13 @@
+# Local Terraform files
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Crash logs
+crash.log
+
+# Terraform variable overrides containing secrets
+terraform.tfvars
+
+# OS files
+.DS_Store
