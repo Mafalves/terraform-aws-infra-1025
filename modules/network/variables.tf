@@ -13,12 +13,17 @@ variable "public_subnets" {
 variable "private_subnets" {
   description = "List of private subnet CIDRs"
   type = list(string)
-  default = [ "10.0.101.0/24", "10.0.1020/24" ]
+  default = [ "10.0.101.0/24", "10.0.102.0/24" ]
 }
 
-variable "tags" {
-    description = "Additional tags to apply to resources"
-    type = map(string)
-    default = {Project = var.project_name}
+variable "project_name" {
+  description = "Project prefix for resource naming"
+  type = string
 }
+
+# variable "tags" {
+#     description = "Additional tags to apply to resources"
+#     type = map(string)
+#     default = {Project = var.project_name}
+# }
 
