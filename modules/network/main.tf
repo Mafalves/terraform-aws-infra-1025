@@ -10,7 +10,7 @@ resource "aws_vpc" "this" {
 
 # Internet Gateway
 resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.this.id
   
   tags = {Project = var.project_name}
 }
@@ -19,7 +19,7 @@ resource "aws_internet_gateway" "this" {
 resource "aws_subnet" "public" {
   for_each = toset(var.public_subnets)
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.this.id
   cidr_block = each.value
   map_public_ip_on_launch = true
   availability_zone = element(data.aws_availability_zones.available.names, 0) # element(list, index) is a Terraform function that picks a single item from a list by its index.
@@ -30,7 +30,7 @@ resource "aws_subnet" "public" {
 # Private Subnets
 resource "aws_subnet" "private" {
   for_each = toset(var.private_subnets)
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.this.id
   cidr_block = each.value
   map_public_ip_on_launch = true
   availability_zone = element(data.aws_availability_zones.available.names, 0) 
@@ -39,7 +39,7 @@ resource "aws_subnet" "private" {
 
 # Public Route Table
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.this.id
   tags = {Project = var.project_name}
 }
 
@@ -47,7 +47,7 @@ resource "aws_route_table" "public" {
 resource "aws_route" "public_internet_access" {
   route_table_id = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id = aws_internet_gateway.igw.id
+  gateway_id = aws_internet_gateway.this.id
 }
 
 # Public Route Table Associations
@@ -60,6 +60,6 @@ resource "aws_route_table_association" "public" {
 
 # Private Route Table
 # resource "aws_route_table" "private" {
-#   vpc_id = aws_vpc.main.id
+#   vpc_id = aws_vpc.this.id
 #    tags = {Project = var.project_name}
 # }
