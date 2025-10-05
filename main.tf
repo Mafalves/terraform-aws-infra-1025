@@ -1,8 +1,14 @@
+# -----------------------------
+# NETWORK MODULE
+# -----------------------------
 module "network" {
   source       = "./modules/network"
   project_name = var.project_name
 }
 
+# -----------------------------
+# SECURITY GROUPS MODULE
+# -----------------------------
 module "security_groups" {
   source       = "./modules/security_group"
   project_name = var.project_name
@@ -39,6 +45,33 @@ module "security_groups" {
         protocol    = "-1",
         cidr_blocks = ["0.0.0.0/0"]
       }]
+    }
+  }
+}
+
+# -----------------------------
+# COMPUTE MODULE
+# -----------------------------
+module "compute" {
+  source = "./modules/compute"
+
+  project_name    = var.project_name
+  vpc_id          = module.network.vpc_id
+  private_subnets = module.network.private_subnets_id
+  public_subnets  = module.network.private_subnets_id
+  security_groups  = values(module.security_groups.security_group_id)
+
+  instances = {
+    web_01 = {
+      instance_type = "t3.micro"
+      subnet_type   = "public"
+      subnet_index  = 0
+    }
+
+    app_01 = {
+      instance_type = "t3.micro"
+      subnet_type   = "private"
+      subnet_index  = 0
     }
   }
 }
