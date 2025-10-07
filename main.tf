@@ -59,7 +59,7 @@ module "compute" {
   vpc_id          = module.network.vpc_id
   private_subnets = module.network.private_subnets_id
   public_subnets  = module.network.private_subnets_id
-  security_groups  = values(module.security_groups.security_group_id)
+  security_groups = values(module.security_groups.security_group_id)
 
   instances = {
     web_01 = {
@@ -74,4 +74,28 @@ module "compute" {
       subnet_index  = 0
     }
   }
+}
+
+# -----------------------------
+# DATABASE MODULE
+# -----------------------------
+module "database" {
+  source = "./modules/database"
+
+  project_name = var.project_name
+
+  # Database core settings
+  db_name           = "my_db1"
+  engine            = "mysql"
+  engine_version    = "8.0"
+  instance_class    = "db.t3.micro"
+  allocated_storage = 20
+
+  username = "admin"
+  password = "P4ssword123!"
+
+  private_subnet_id   = module.network.private_subnets_id
+  create_secret       = true
+  skip_final_snapshot = true # Same as default value...
+  security_group_ids  = []   # Optional, Same as default value...
 }

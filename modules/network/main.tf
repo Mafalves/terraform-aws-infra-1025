@@ -29,11 +29,13 @@ resource "aws_subnet" "public" {
 
 # Private Subnets
 resource "aws_subnet" "private" {
-  for_each = toset(var.private_subnets)
+  count = length(var.private_subnets)
+
   vpc_id = aws_vpc.this.id
-  cidr_block = each.value
+  cidr_block = var.private_subnets[count.index]
+  availability_zone = element(data.aws_availability_zones.available.names, count.index) 
   map_public_ip_on_launch = true
-  availability_zone = element(data.aws_availability_zones.available.names, 0) 
+
   tags = {Project = var.project_name}
 }
 
