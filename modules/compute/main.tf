@@ -22,6 +22,5 @@ resource "aws_instance" "this" {
     tags = {
         Project = var.project_name 
         Name    = "${var.project_name}-${each.key}"
-    }
-    
+    } 
   }
