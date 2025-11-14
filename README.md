@@ -31,7 +31,7 @@ Dynamic security groups created from a map, allowing scalable and reusable defin
 For logs, static content, or Terraform remote state.
 
 ## Project Structure
-
+```
 terraform-aws-infra/
 │
 ├── main.tf
@@ -40,12 +40,12 @@ terraform-aws-infra/
 ├── variables.tf
 ├── README.md
 │
-├── modules/
-│   ├── compute/
-│   ├── database/
-│   ├── network/
-│   ├── security_group/
-
+└── modules/
+    ├── compute/
+    ├── database/
+    ├── network/
+    └── security_group/
+```
 ## Deployment Instructions
 
 ### Initialize Terraform
