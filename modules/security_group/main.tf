@@ -19,10 +19,13 @@ resource "aws_security_group" "this" {
     content {
       from_port = egress.value.from_port
       to_port = egress.value.to_port
-      protocol = egress.value.to_port
+      protocol = egress.value.protocol
       cidr_blocks = egress.value.cidr_blocks
     }
   }
 
-    tags = {Project = var.project_name}
+    tags = {
+      Name    = "${var.project_name}-${each.key}"
+      Project = var.project_name
+    }
 }

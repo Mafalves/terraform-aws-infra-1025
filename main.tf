@@ -33,12 +33,12 @@ module "security_groups" {
 
     ssh_sg = {
       description = "Allow SSH connection"
-      ingress = [{
+      ingress = length(var.allowed_ssh_cidr_blocks) > 0 ? [{
         from_port   = 22,
         to_port     = 22,
         protocol    = "tcp",
-        cidr_blocks = ["0.0.0.0/32"]
-      }],
+        cidr_blocks = var.allowed_ssh_cidr_blocks
+      }] : []
       egress = [{
         from_port   = 0,
         to_port     = 0,
@@ -58,7 +58,8 @@ module "compute" {
   project_name    = var.project_name
   vpc_id          = module.network.vpc_id
   private_subnets = module.network.private_subnets_id
-  public_subnets  = module.network.private_subnets_id
+  public_subnets  = module.network.public_subnets_id
+  # Extract just the security group IDs (values) from the map
   security_groups = values(module.security_groups.security_group_id)
 
   instances = {
@@ -92,7 +93,7 @@ module "database" {
   allocated_storage = 20
 
   username = "admin"
-  password = "P4ssword123!"
+  # password omitted - will be auto-generated and stored in Secrets Manager
 
   private_subnet_id   = module.network.private_subnets_id
   create_secret       = true

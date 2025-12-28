@@ -9,3 +9,9 @@ variable "project_name" {
   type        = string
   default     = "terraform-aws-infra-1025"
 }
+
+variable "allowed_ssh_cidr_blocks" {
+  description = "CIDR blocks allowed to SSH into instances. Default is empty list (no SSH access). Use ['0.0.0.0/0'] for testing only (NOT production)"
+  type        = list(string)
+  default     = []
+}

@@ -1,36 +1,53 @@
+# Generate random password if none provided
+resource "random_password" "db_password" {
+  length  = 16
+  special = true
+  # Exclude characters that might cause issues in connection strings
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 locals {
-    parameter_group_name = (
-        length(aws_db_parameter_group.this) > 0 
-            ? aws_db_parameter_group.this[0].name
-            : null
-    )
+    # Use provided password or generate one automatically
+    db_password = coalesce(var.password, random_password.db_password.result)
+    
+    # Get parameter group name if it exists (only for PostgreSQL)
+    parameter_group_name = try(aws_db_parameter_group.this[0].name, null)
 }
 
 resource "aws_db_subnet_group" "this" {
-  name       = "db-subnet-group"
-  description = "Database subnet group for ${var.db_name}"
+  name       = "${var.project_name}-db-subnet-group"
+  description = "Database subnet group for ${var.project_name}/${var.db_name}"
   subnet_ids = var.private_subnet_id
 
-  tags = {Project = var.project_name}
+  tags = {
+    Name    = "${var.project_name}-db-subnet-group"
+    Project = var.project_name
+  }
 }
 
 # Optional parameter group for PostgreSQL
 resource "aws_db_parameter_group" "this" {
     count = lower(var.engine) == "postgres" ? 1 : 0
-    name = "db-param-group"
+    name = "${var.project_name}-db-param-group"
     family = "postgres14"
-    description = "Custom parameter group for ${var.db_name}"
+    description = "Custom parameter group for ${var.project_name}/${var.db_name}"
 
-    tags = {Project = var.project_name}
+    tags = {
+      Name    = "${var.project_name}-db-param-group"
+      Project = var.project_name
+    }
 }
 
-# Store DB credentials in AWS Secrete Manager (optional)
+# Store DB credentials in AWS Secrets Manager (optional)
 resource "aws_secretsmanager_secret" "this" {
     count = var.create_secret ? 1 : 0
-    name = "example"
-    description = "Secrete manager for ${var.db_name}"
+    name = "${var.project_name}-db-credentials"
+    description = "Database credentials for ${var.project_name}/${var.db_name}"
 
-    tags = {Project = var.project_name}
+    tags = {
+      Name    = "${var.project_name}-db-credentials"
+      Project = var.project_name
+    }
 }
 
 resource "aws_secretsmanager_secret_version" "this" {
@@ -38,7 +55,7 @@ resource "aws_secretsmanager_secret_version" "this" {
     secret_id     = aws_secretsmanager_secret.this[0].id
     secret_string = jsonencode({
         username = var.username
-        password = var.password
+        password = local.db_password
         endpoint = aws_db_instance.this.address
     })
 }
@@ -48,7 +65,7 @@ resource "aws_db_instance" "this" {
     
     db_name              = var.db_name
     username             = var.username
-    password             = var.password
+    password             = local.db_password
 
     engine               = var.engine
     engine_version       = var.engine_version
@@ -68,6 +85,9 @@ resource "aws_db_instance" "this" {
 
     auto_minor_version_upgrade = true
 
-    tags = {Project = var.project_name}
+    tags = {
+      Name    = "${var.project_name}-${var.db_name}"
+      Project = var.project_name
+    }
 
 }

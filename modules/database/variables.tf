@@ -58,7 +58,7 @@ variable "username" {
 }
 
 variable "password" {
-    description = "DB admin password (sensitive). Prefer passing from SSM/Secrets Manager or CI secret"
+    description = "DB admin password (sensitive). If not provided, a random password will be generated and stored in Secrets Manager"
     type = string
     sensitive = true
     default = null  
