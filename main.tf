@@ -67,13 +67,19 @@ module "compute" {
       instance_type = "t3.micro"
       subnet_type   = "public"
       subnet_index  = 0
+      user_data = templatefile("${path.module}/user_data_docker.sh", {
+        docker_image = "matalve/flask-app:latest"
+        app_version  = "1.0.0"
+        environment  = "development"
+        port         = 5000
+      })
     }
 
-    app_01 = {
-      instance_type = "t3.micro"
-      subnet_type   = "private"
-      subnet_index  = 0
-    }
+    # backend_01 = {
+    #   instance_type = "t3.micro"
+    #   subnet_type   = "private"
+    #   subnet_index  = 0
+    # }
   }
 }
 

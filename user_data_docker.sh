@@ -27,14 +27,17 @@ usermod -a -G docker ec2-user
 # Pull the Flask app image from Docker Hub
 docker pull ${docker_image}
 
+# Remove existing container if it exists (for idempotency)
+docker rm -f flask-app 2>/dev/null || true
+
 # Run the Flask container
 docker run -d \
   --name flask-app \
   --restart unless-stopped \
-  -p 5000:5000 \
+  -p 80:${port} \
   -e APP_VERSION="${app_version}" \
   -e ENVIRONMENT="${environment}" \
-  -e PORT=5000 \
+  -e PORT=${port} \
   ${docker_image}
 
 # Verify if container is running

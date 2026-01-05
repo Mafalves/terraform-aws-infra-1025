@@ -15,10 +15,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "terraform-state-mateus-1025"
-    key            = "terraform.tfstate"
-    region         = "ca-central-1"
-    encrypt        = true
+    bucket  = "terraform-state-mateus-1025"
+    key     = "terraform.tfstate"
+    region  = "ca-central-1"
+    encrypt = true
   }
 }
 
