@@ -7,6 +7,7 @@ variable "instances" {
         subnet_index = number # which subnet index in the list
         key_name = optional(string)
         user_data = optional(string)
+        tags = optional(map(string))
     })) 
 }
 
@@ -37,3 +38,8 @@ variable "project_name" {
   type = string
 }
 
+variable "iam_instance_profile" {
+    description = "IAM instance profile to attach to the EC2 instances (optional - omit for SSH-only access)"
+    type        = string
+    default     = null
+}

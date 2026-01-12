@@ -11,9 +11,12 @@ resource "aws_instance" "this" {
     key_name = lookup(each.value, "key_name", null)
     user_data = lookup(each.value, "user_data", null)
     associate_public_ip_address = each.value.subnet_type == "public"
-
-    tags = {
+    iam_instance_profile = var.iam_instance_profile
+    
+    tags = merge({
         Project = var.project_name 
         Name    = "${var.project_name}-${each.key}"
-    } 
+    },
+    lookup(each.value, "tags", {}) # if tags are not provided, use an empty map
+    )
   }

@@ -62,6 +62,9 @@ module "compute" {
   # Extract just the security group IDs (values) from the map
   security_groups = values(module.security_groups.security_group_id)
 
+  # If iam_instance_profile is null, Terraform omits it from the resource
+  iam_instance_profile = aws_iam_instance_profile.ec2_ssm_profile.name
+
   instances = {
     web_01 = {
       instance_type = "t3.micro"
@@ -73,13 +76,21 @@ module "compute" {
         environment  = "development"
         port         = 5000
       })
+      tags = {
+        Environment = "development"
+        Application = "flask-app"
+      }
     }
 
-    # backend_01 = {
-    #   instance_type = "t3.micro"
-    #   subnet_type   = "private"
-    #   subnet_index  = 0
-    # }
+    backend_01 = {
+      instance_type = "t3.micro"
+      subnet_type   = "private"
+      subnet_index  = 0
+      tags = {
+        Environment = "production "
+        Application = "backend"
+      }
+    }
   }
 }
 
@@ -102,7 +113,7 @@ module "database" {
   # password omitted - will be auto-generated and stored in Secrets Manager
 
   private_subnet_id   = module.network.private_subnets_id
-  create_secret       = true
+  create_secret       = false
   skip_final_snapshot = true # Same as default value...
   security_group_ids  = []   # Optional, Same as default value...
 }
